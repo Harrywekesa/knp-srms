@@ -181,20 +181,6 @@ fun LoginScreen(
                             Text("Student", fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
                         }
                         Button(
-                            onClick = { role = "LECTURER" },
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = if (role == "LECTURER") MaterialTheme.colorScheme.primary else Color.Transparent,
-                                contentColor = if (role == "LECTURER") MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
-                            ),
-                            shape = RoundedCornerShape(8.dp),
-                            modifier = Modifier
-                                .weight(1f)
-                                .height(38.dp),
-                            contentPadding = PaddingValues(0.dp)
-                        ) {
-                            Text("Lecturer", fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
-                        }
-                        Button(
                             onClick = { role = "ADMIN" },
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = if (role == "ADMIN") MaterialTheme.colorScheme.primary else Color.Transparent,
@@ -309,23 +295,7 @@ fun LoginScreen(
                         }
                     }
 
-                    HorizontalDivider(color = Color.LightGray.copy(alpha = 0.5f))
 
-                    // Lecturer Demo Click
-                    TextButton(
-                        onClick = {
-                            username = "KNP/LEC/402"
-                            password = "password123"
-                            role = "LECTURER"
-                        },
-                        contentPadding = PaddingValues(vertical = 4.dp, horizontal = 0.dp),
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Column(modifier = Modifier.fillMaxWidth()) {
-                            Text("Lecturer Account", fontSize = 12.sp, color = Color.Black, fontWeight = FontWeight.SemiBold)
-                            Text("User: KNP/LEC/402 | Pass: password123", fontSize = 11.sp, color = Color.Gray)
-                        }
-                    }
 
                     HorizontalDivider(color = Color.LightGray.copy(alpha = 0.5f))
 

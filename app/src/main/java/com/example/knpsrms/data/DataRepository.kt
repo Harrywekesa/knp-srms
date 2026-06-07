@@ -157,15 +157,22 @@ class DataRepository(context: Context) {
         )
         val items = mutableListOf<FeeStatementItem>()
         var totalPaid = 0.0
+        var totalInvoiced = 0.0
         while (cursor.moveToNext()) {
             val amount = cursor.getDouble(1)
-            totalPaid += amount
+            val receipt = cursor.getString(2)
+            val isInvoice = receipt == null || receipt.startsWith("INV-")
+            if (isInvoice) {
+                totalInvoiced += amount
+            } else {
+                totalPaid += amount
+            }
             items.add(
                 FeeStatementItem(
                     id = cursor.getInt(0),
-                    type = "PAYMENT",
+                    type = if (isInvoice) "INVOICE" else "PAYMENT",
                     amount = amount,
-                    receiptNo = cursor.getString(2),
+                    receiptNo = receipt,
                     date = cursor.getString(3),
                     description = cursor.getString(4)
                 )
@@ -173,20 +180,20 @@ class DataRepository(context: Context) {
         }
         cursor.close()
 
-        // Invoiced is mock total tuition invoice base
-        val totalInvoiced = totalPaid + currentBalance
-
-        // Add base tuition invoice item for visualization in statement ledger
-        items.add(
-            FeeStatementItem(
-                id = -1,
-                type = "INVOICE",
-                amount = totalInvoiced,
-                receiptNo = null,
-                date = "2025-09-01",
-                description = "Tuition Invoice - Year 1 Sem 2",
+        // If there were no explicit invoices in database, we can keep the base mock invoice so the layout doesn't look empty for old students!
+        if (totalInvoiced == 0.0) {
+            totalInvoiced = totalPaid + currentBalance
+            items.add(
+                FeeStatementItem(
+                    id = -1,
+                    type = "INVOICE",
+                    amount = totalInvoiced,
+                    receiptNo = null,
+                    date = "2025-09-01",
+                    description = "Tuition Invoice - Year 1 Sem 2",
+                )
             )
-        )
+        }
 
         // Sort items by date descending
         items.sortByDescending { it.date }
@@ -603,5 +610,397 @@ class DataRepository(context: Context) {
             db.endTransaction()
         }
         return importedCount
+    }
+
+    // Audit Logging
+    fun logAction(actionType: String, description: String) {
+        val db = dbHelper.writableDatabase
+        val timestamp = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.getDefault()).format(java.util.Date())
+        val values = ContentValues().apply {
+            put("timestamp", timestamp)
+            put("action_type", actionType)
+            put("description", description)
+        }
+        db.insert(SrmsDbHelper.TABLE_AUDIT_LOGS, null, values)
+    }
+
+    fun getAuditLogs(): List<AuditLog> {
+        val db = dbHelper.readableDatabase
+        val cursor = db.rawQuery("SELECT id, timestamp, action_type, description FROM ${SrmsDbHelper.TABLE_AUDIT_LOGS} ORDER BY id DESC", null)
+        val logs = mutableListOf<AuditLog>()
+        while (cursor.moveToNext()) {
+            logs.add(
+                AuditLog(
+                    id = cursor.getInt(0),
+                    timestamp = cursor.getString(1) ?: "",
+                    actionType = cursor.getString(2) ?: "",
+                    description = cursor.getString(3) ?: ""
+                )
+            )
+        }
+        cursor.close()
+        return logs
+    }
+
+    // Curriculum Setup
+    fun getAllDepartments(): List<Department> {
+        val db = dbHelper.readableDatabase
+        val cursor = db.rawQuery("SELECT id, code, name FROM ${SrmsDbHelper.TABLE_DEPARTMENTS} ORDER BY code ASC", null)
+        val list = mutableListOf<Department>()
+        while (cursor.moveToNext()) {
+            list.add(
+                Department(
+                    id = cursor.getInt(0),
+                    code = cursor.getString(1),
+                    name = cursor.getString(2)
+                )
+            )
+        }
+        cursor.close()
+        return list
+    }
+
+    fun addDepartment(code: String, name: String): Boolean {
+        val db = dbHelper.writableDatabase
+        val values = ContentValues().apply {
+            put("code", code)
+            put("name", name)
+        }
+        val id = db.insert(SrmsDbHelper.TABLE_DEPARTMENTS, null, values)
+        if (id != -1L) {
+            logAction("CURRICULUM", "Created department: $code - $name")
+            return true
+        }
+        return false
+    }
+
+    fun getAllCourses(): List<Course> {
+        val db = dbHelper.readableDatabase
+        val cursor = db.rawQuery("SELECT id, code, name, department_code FROM ${SrmsDbHelper.TABLE_COURSES} ORDER BY code ASC", null)
+        val list = mutableListOf<Course>()
+        while (cursor.moveToNext()) {
+            list.add(
+                Course(
+                    id = cursor.getInt(0),
+                    code = cursor.getString(1),
+                    name = cursor.getString(2),
+                    departmentCode = cursor.getString(3)
+                )
+            )
+        }
+        cursor.close()
+        return list
+    }
+
+    fun addCourse(code: String, name: String, departmentCode: String): Boolean {
+        val db = dbHelper.writableDatabase
+        val values = ContentValues().apply {
+            put("code", code)
+            put("name", name)
+            put("department_code", departmentCode)
+        }
+        val id = db.insert(SrmsDbHelper.TABLE_COURSES, null, values)
+        if (id != -1L) {
+            logAction("CURRICULUM", "Created course: $code - $name under dept $departmentCode")
+            return true
+        }
+        return false
+    }
+
+    fun getAllUnits(): List<CourseUnit> {
+        val db = dbHelper.readableDatabase
+        val cursor = db.rawQuery("SELECT code, name, course_code, lecturer_id FROM ${SrmsDbHelper.TABLE_UNITS} ORDER BY code ASC", null)
+        val list = mutableListOf<CourseUnit>()
+        while (cursor.moveToNext()) {
+            list.add(
+                CourseUnit(
+                    code = cursor.getString(0),
+                    name = cursor.getString(1),
+                    courseCode = cursor.getString(2),
+                    lecturerId = cursor.getString(3)
+                )
+            )
+        }
+        cursor.close()
+        return list
+    }
+
+    fun addUnit(code: String, name: String, courseCode: String, lecturerId: String?): Boolean {
+        val db = dbHelper.writableDatabase
+        val values = ContentValues().apply {
+            put("code", code)
+            put("name", name)
+            put("course_code", courseCode)
+            put("lecturer_id", lecturerId)
+        }
+        val id = db.insert(SrmsDbHelper.TABLE_UNITS, null, values)
+        if (id != -1L) {
+            logAction("CURRICULUM", "Created competency unit: $code - $name for course $courseCode")
+            return true
+        }
+        return false
+    }
+
+    // User Credentials provisioning
+    fun getAllUsers(): List<User> {
+        val db = dbHelper.readableDatabase
+        val cursor = db.rawQuery("SELECT id, username, role, email FROM ${SrmsDbHelper.TABLE_USERS} ORDER BY username ASC", null)
+        val list = mutableListOf<User>()
+        while (cursor.moveToNext()) {
+            list.add(
+                User(
+                    id = cursor.getInt(0),
+                    username = cursor.getString(1),
+                    role = cursor.getString(2),
+                    email = cursor.getString(3)
+                )
+            )
+        }
+        cursor.close()
+        return list
+    }
+
+    fun addUser(username: String, password: String, role: String, email: String): Boolean {
+        val db = dbHelper.writableDatabase
+        val values = ContentValues().apply {
+            put("username", username)
+            put("password", password)
+            put("role", role)
+            put("email", email)
+        }
+        val id = db.insert(SrmsDbHelper.TABLE_USERS, null, values)
+        if (id != -1L) {
+            logAction("USERS", "Created credentials profile for user: $username ($role)")
+            return true
+        }
+        return false
+    }
+
+    fun deleteUser(userId: Int): Boolean {
+        val db = dbHelper.writableDatabase
+        db.beginTransaction()
+        try {
+            var username = ""
+            val cursor = db.rawQuery("SELECT username FROM users WHERE id = ?", arrayOf(userId.toString()))
+            if (cursor.moveToFirst()) {
+                username = cursor.getString(0)
+            }
+            cursor.close()
+            
+            if (username.isNotEmpty()) {
+                db.delete("students", "user_id = ?", arrayOf(userId.toString()))
+                db.delete("lecturers", "user_id = ?", arrayOf(userId.toString()))
+                db.delete("users", "id = ?", arrayOf(userId.toString()))
+                logAction("USERS", "Deleted user profile and matching rosters for username: $username")
+                db.setTransactionSuccessful()
+                return true
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        } finally {
+            db.endTransaction()
+        }
+        return false
+    }
+
+    // Academic controls
+    fun enrollStudentInUnit(studentId: String, unitCode: String): Boolean {
+        val db = dbHelper.writableDatabase
+        db.beginTransaction()
+        try {
+            val cursor = db.rawQuery(
+                "SELECT id FROM enrollments WHERE student_id = ? AND unit_code = ?",
+                arrayOf(studentId, unitCode)
+            )
+            val alreadyEnrolled = cursor.moveToFirst()
+            cursor.close()
+            if (alreadyEnrolled) {
+                db.setTransactionSuccessful()
+                return true
+            }
+
+            val enrollment = ContentValues().apply {
+                put("student_id", studentId)
+                put("unit_code", unitCode)
+                put("semester", "YEAR 1 SEM 2")
+                put("academic_year", "2025/2026")
+            }
+            val enrollId = db.insert(SrmsDbHelper.TABLE_ENROLLMENTS, null, enrollment)
+            if (enrollId != -1L) {
+                val grade = ContentValues().apply {
+                    put("enrollment_id", enrollId)
+                }
+                db.insert(SrmsDbHelper.TABLE_GRADES, null, grade)
+
+                logAction("ACADEMIC", "Enrolled student $studentId in unit $unitCode")
+                db.setTransactionSuccessful()
+                return true
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        } finally {
+            db.endTransaction()
+        }
+        return false
+    }
+
+    fun updateStudentGrade(studentId: String, unitCode: String, catMark: Double?, examMark: Double?): Boolean {
+        val db = dbHelper.writableDatabase
+        db.beginTransaction()
+        try {
+            val cursor = db.rawQuery(
+                "SELECT id FROM enrollments WHERE student_id = ? AND unit_code = ?",
+                arrayOf(studentId, unitCode)
+            )
+            var enrollId = -1L
+            if (cursor.moveToFirst()) {
+                enrollId = cursor.getLong(0)
+            }
+            cursor.close()
+
+            if (enrollId != -1L) {
+                val gradeCursor = db.rawQuery("SELECT id FROM grades WHERE enrollment_id = ?", arrayOf(enrollId.toString()))
+                val exists = gradeCursor.moveToFirst()
+                gradeCursor.close()
+
+                val values = ContentValues().apply {
+                    if (catMark != null) put("cat_mark", catMark) else putNull("cat_mark")
+                    if (examMark != null) put("exam_mark", examMark) else putNull("exam_mark")
+                }
+
+                val success = if (exists) {
+                    db.update(SrmsDbHelper.TABLE_GRADES, values, "enrollment_id = ?", arrayOf(enrollId.toString())) > 0
+                } else {
+                    values.put("enrollment_id", enrollId)
+                    db.insert(SrmsDbHelper.TABLE_GRADES, null, values) > -1
+                }
+
+                if (success) {
+                    logAction("ACADEMIC", "Updated grades for student $studentId in unit $unitCode: CAT=${catMark ?: "N/A"}, Exam=${examMark ?: "N/A"}")
+                    db.setTransactionSuccessful()
+                    return true
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        } finally {
+            db.endTransaction()
+        }
+        return false
+    }
+
+    fun recordAttendance(studentId: String, unitCode: String, date: String, status: String): Boolean {
+        val db = dbHelper.writableDatabase
+        db.beginTransaction()
+        try {
+            val cursor = db.rawQuery(
+                "SELECT id FROM enrollments WHERE student_id = ? AND unit_code = ?",
+                arrayOf(studentId, unitCode)
+            )
+            var enrollId = -1L
+            if (cursor.moveToFirst()) {
+                enrollId = cursor.getLong(0)
+            }
+            cursor.close()
+
+            if (enrollId != -1L) {
+                val values = ContentValues().apply {
+                    put("enrollment_id", enrollId)
+                    put("date", date)
+                    put("status", status)
+                }
+                val existCursor = db.rawQuery(
+                    "SELECT id FROM attendance WHERE enrollment_id = ? AND date = ?",
+                    arrayOf(enrollId.toString(), date)
+                )
+                val exists = existCursor.moveToFirst()
+                val recordId = if (exists) {
+                    val id = existCursor.getLong(0)
+                    db.update("attendance", values, "id = ?", arrayOf(id.toString()))
+                    id
+                } else {
+                    db.insert("attendance", null, values)
+                }
+                existCursor.close()
+
+                if (recordId != -1L) {
+                    logAction("ACADEMIC", "Recorded attendance for $studentId in unit $unitCode on $date: $status")
+                    db.setTransactionSuccessful()
+                    return true
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        } finally {
+            db.endTransaction()
+        }
+        return false
+    }
+
+    // Ledger Actions
+    fun recordFeePayment(studentId: String, amount: Double, receiptNo: String, date: String, description: String): Boolean {
+        val db = dbHelper.writableDatabase
+        db.beginTransaction()
+        try {
+            val receiptCursor = db.rawQuery("SELECT id FROM fee_payments WHERE receipt_no = ?", arrayOf(receiptNo))
+            val duplicateReceipt = receiptCursor.moveToFirst()
+            receiptCursor.close()
+            if (duplicateReceipt) {
+                return false
+            }
+
+            val values = ContentValues().apply {
+                put("student_id", studentId)
+                put("amount", amount)
+                put("receipt_no", receiptNo)
+                put("payment_date", date)
+                put("description", description)
+            }
+            val id = db.insert(SrmsDbHelper.TABLE_FEE_PAYMENTS, null, values)
+            if (id != -1L) {
+                db.execSQL(
+                    "UPDATE students SET fee_balance = fee_balance - ? WHERE admission_no = ?",
+                    arrayOf(amount.toString(), studentId)
+                )
+                logAction("FINANCIAL", "Recorded payment of KES $amount for student $studentId. Receipt: $receiptNo")
+                db.setTransactionSuccessful()
+                return true
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        } finally {
+            db.endTransaction()
+        }
+        return false
+    }
+
+    fun recordTuitionInvoice(studentId: String, amount: Double, date: String, description: String): Boolean {
+        val db = dbHelper.writableDatabase
+        db.beginTransaction()
+        try {
+            val receiptNo = "INV-${System.currentTimeMillis()}"
+            val values = ContentValues().apply {
+                put("student_id", studentId)
+                put("amount", amount)
+                put("receipt_no", receiptNo)
+                put("payment_date", date)
+                put("description", description)
+            }
+            val id = db.insert(SrmsDbHelper.TABLE_FEE_PAYMENTS, null, values)
+            if (id != -1L) {
+                db.execSQL(
+                    "UPDATE students SET fee_balance = fee_balance + ? WHERE admission_no = ?",
+                    arrayOf(amount.toString(), studentId)
+                )
+                logAction("FINANCIAL", "Recorded tuition invoice of KES $amount for student $studentId.")
+                db.setTransactionSuccessful()
+                return true
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        } finally {
+            db.endTransaction()
+        }
+        return false
     }
 }

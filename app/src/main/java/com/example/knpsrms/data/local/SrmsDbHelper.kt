@@ -9,7 +9,7 @@ class SrmsDbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, 
 
     companion object {
         const val DATABASE_NAME = "knp_srms.db"
-        const val DATABASE_VERSION = 2
+        const val DATABASE_VERSION = 3
 
         // Tables Names
         const val TABLE_USERS = "users"
@@ -26,6 +26,10 @@ class SrmsDbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, 
         const val TABLE_COMMUNICATIONS = "official_communications"
         const val TABLE_POE = "portfolios_of_evidence"
         const val TABLE_FINANCIAL_AID = "financial_aid"
+
+        const val TABLE_DEPARTMENTS = "departments"
+        const val TABLE_COURSES = "courses"
+        const val TABLE_AUDIT_LOGS = "audit_logs"
     }
 
     override fun onCreate(db: SQLiteDatabase) {
@@ -37,6 +41,24 @@ class SrmsDbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, 
                 password TEXT,
                 role TEXT,
                 email TEXT
+            )
+        """)
+
+        db.execSQL("""
+            CREATE TABLE $TABLE_DEPARTMENTS (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                code TEXT UNIQUE,
+                name TEXT
+            )
+        """)
+
+        db.execSQL("""
+            CREATE TABLE $TABLE_COURSES (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                code TEXT UNIQUE,
+                name TEXT,
+                department_code TEXT,
+                FOREIGN KEY(department_code) REFERENCES $TABLE_DEPARTMENTS(code)
             )
         """)
 
@@ -59,7 +81,8 @@ class SrmsDbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, 
                 enrollment_status TEXT,
                 current_year INTEGER,
                 graduation_cleared INTEGER,
-                FOREIGN KEY(user_id) REFERENCES $TABLE_USERS(id)
+                FOREIGN KEY(user_id) REFERENCES $TABLE_USERS(id),
+                FOREIGN KEY(course_code) REFERENCES $TABLE_COURSES(code)
             )
         """)
 
@@ -70,7 +93,8 @@ class SrmsDbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, 
                 first_name TEXT,
                 last_name TEXT,
                 department TEXT,
-                FOREIGN KEY(user_id) REFERENCES $TABLE_USERS(id)
+                FOREIGN KEY(user_id) REFERENCES $TABLE_USERS(id),
+                FOREIGN KEY(department) REFERENCES $TABLE_DEPARTMENTS(code)
             )
         """)
 
@@ -80,7 +104,8 @@ class SrmsDbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, 
                 name TEXT,
                 course_code TEXT,
                 lecturer_id TEXT,
-                FOREIGN KEY(lecturer_id) REFERENCES $TABLE_LECTURERS(employee_no)
+                FOREIGN KEY(lecturer_id) REFERENCES $TABLE_LECTURERS(employee_no),
+                FOREIGN KEY(course_code) REFERENCES $TABLE_COURSES(code)
             )
         """)
 
@@ -113,8 +138,7 @@ class SrmsDbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, 
                 date TEXT,
                 status TEXT,
                 recorded_by TEXT,
-                FOREIGN KEY(enrollment_id) REFERENCES $TABLE_ENROLLMENTS(id),
-                FOREIGN KEY(recorded_by) REFERENCES $TABLE_LECTURERS(employee_no)
+                FOREIGN KEY(enrollment_id) REFERENCES $TABLE_ENROLLMENTS(id)
             )
         """)
 
@@ -123,7 +147,7 @@ class SrmsDbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, 
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 student_id TEXT,
                 amount REAL,
-                receipt_no TEXT,
+                receipt_no TEXT UNIQUE,
                 payment_date TEXT,
                 description TEXT,
                 FOREIGN KEY(student_id) REFERENCES $TABLE_STUDENTS(admission_no)
@@ -189,11 +213,21 @@ class SrmsDbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, 
             )
         """)
 
+        db.execSQL("""
+            CREATE TABLE $TABLE_AUDIT_LOGS (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                timestamp TEXT,
+                action_type TEXT,
+                description TEXT
+            )
+        """)
+
         // Pre-populate mock data
         insertMockData(db)
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_AUDIT_LOGS")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_FINANCIAL_AID")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_POE")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_COMMUNICATIONS")
@@ -206,11 +240,49 @@ class SrmsDbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, 
         db.execSQL("DROP TABLE IF EXISTS $TABLE_UNITS")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_LECTURERS")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_STUDENTS")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_COURSES")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_DEPARTMENTS")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_USERS")
         onCreate(db)
     }
 
     private fun insertMockData(db: SQLiteDatabase) {
+        // 0. Insert Departments & Courses
+        val depts = listOf(
+            Pair("ICT", "Information Communication Technology"),
+            Pair("BUS", "Business Studies"),
+            Pair("ENG", "Engineering")
+        )
+        for ((code, name) in depts) {
+            val cv = ContentValues().apply {
+                put("code", code)
+                put("name", name)
+            }
+            db.insert(TABLE_DEPARTMENTS, null, cv)
+        }
+
+        val courses = listOf(
+            Triple("DICT", "Diploma in ICT", "ICT"),
+            Triple("DIBM", "Diploma in Business Management", "BUS"),
+            Triple("DIEC", "Diploma in Electrical & Electronics Engineering", "ENG")
+        )
+        for ((code, name, deptCode) in courses) {
+            val cv = ContentValues().apply {
+                put("code", code)
+                put("name", name)
+                put("department_code", deptCode)
+            }
+            db.insert(TABLE_COURSES, null, cv)
+        }
+
+        // Insert initial audit logs
+        val log = ContentValues().apply {
+            put("timestamp", "2026-06-06 12:00:00")
+            put("action_type", "SYSTEM")
+            put("description", "KNP SRMS system initialization and mock database population complete.")
+        }
+        db.insert(TABLE_AUDIT_LOGS, null, log)
+
         // 1. Insert Users
         // Student User
         val sUser = ContentValues().apply {

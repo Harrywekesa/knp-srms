@@ -148,3 +148,30 @@ data class FinancialAid(
     val allocationDate: String
 )
 
+data class Department(
+    val id: Int,
+    val code: String,
+    val name: String
+)
+
+data class Course(
+    val id: Int,
+    val code: String,
+    val name: String,
+    val departmentCode: String
+)
+
+data class AuditLog(
+    val id: Int,
+    val timestamp: String,
+    val actionType: String,
+    val description: String
+)
+
+data class CourseUnit(
+    val code: String,
+    val name: String,
+    val courseCode: String,
+    val lecturerId: String?
+)
+

@@ -34,6 +34,175 @@ class AdminViewModel(private val repository: DataRepository) : ViewModel() {
     private val _uiState = MutableStateFlow<AdminUiState>(AdminUiState.Loading)
     val uiState: StateFlow<AdminUiState> = _uiState.asStateFlow()
 
+    private val _departments = MutableStateFlow<List<Department>>(emptyList())
+    val departments: StateFlow<List<Department>> = _departments.asStateFlow()
+
+    private val _courses = MutableStateFlow<List<Course>>(emptyList())
+    val courses: StateFlow<List<Course>> = _courses.asStateFlow()
+
+    private val _units = MutableStateFlow<List<CourseUnit>>(emptyList())
+    val units: StateFlow<List<CourseUnit>> = _units.asStateFlow()
+
+    private val _userProfiles = MutableStateFlow<List<User>>(emptyList())
+    val userProfiles: StateFlow<List<User>> = _userProfiles.asStateFlow()
+
+    private val _auditLogs = MutableStateFlow<List<AuditLog>>(emptyList())
+    val auditLogs: StateFlow<List<AuditLog>> = _auditLogs.asStateFlow()
+
+    init {
+        loadCurriculum()
+        loadUsers()
+        loadAuditLogs()
+    }
+
+    fun loadCurriculum() {
+        viewModelScope.launch {
+            try {
+                _departments.value = repository.getAllDepartments()
+                _courses.value = repository.getAllCourses()
+                _units.value = repository.getAllUnits()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+    fun loadUsers() {
+        viewModelScope.launch {
+            try {
+                _userProfiles.value = repository.getAllUsers()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+    fun loadAuditLogs() {
+        viewModelScope.launch {
+            try {
+                _auditLogs.value = repository.getAuditLogs()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+    fun addDepartment(code: String, name: String) {
+        viewModelScope.launch {
+            if (repository.addDepartment(code, name)) {
+                loadCurriculum()
+                loadAuditLogs()
+            }
+        }
+    }
+
+    fun addCourse(code: String, name: String, departmentCode: String) {
+        viewModelScope.launch {
+            if (repository.addCourse(code, name, departmentCode)) {
+                loadCurriculum()
+                loadAuditLogs()
+            }
+        }
+    }
+
+    fun addUnit(code: String, name: String, courseCode: String, lecturerId: String?) {
+        viewModelScope.launch {
+            if (repository.addUnit(code, name, courseCode, lecturerId)) {
+                loadCurriculum()
+                loadAuditLogs()
+            }
+        }
+    }
+
+    fun addUser(username: String, password: String, role: String, email: String) {
+        viewModelScope.launch {
+            if (repository.addUser(username, password, role, email)) {
+                loadUsers()
+                loadAuditLogs()
+            }
+        }
+    }
+
+    fun deleteUser(userId: Int) {
+        viewModelScope.launch {
+            if (repository.deleteUser(userId)) {
+                loadUsers()
+                loadAuditLogs()
+                val currentState = _uiState.value
+                if (currentState is AdminUiState.Success) {
+                    val currentSelected = currentState.selectedStudent
+                    val students = repository.getAllStudents()
+                    if (currentSelected != null) {
+                        val userObj = _userProfiles.value.find { it.id == userId }
+                        if (userObj != null && userObj.username == currentSelected.admissionNo) {
+                            clearSelectedStudent()
+                        }
+                    }
+                    _uiState.update { currentState.copy(students = students) }
+                }
+            }
+        }
+    }
+
+    fun enrollStudentInUnit(studentId: String, unitCode: String) {
+        viewModelScope.launch {
+            if (repository.enrollStudentInUnit(studentId, unitCode)) {
+                val student = repository.getStudent(studentId)
+                if (student != null) selectStudent(student)
+                loadAuditLogs()
+            }
+        }
+    }
+
+    fun updateStudentGrade(studentId: String, unitCode: String, catMark: Double?, examMark: Double?) {
+        viewModelScope.launch {
+            if (repository.updateStudentGrade(studentId, unitCode, catMark, examMark)) {
+                val student = repository.getStudent(studentId)
+                if (student != null) selectStudent(student)
+                loadAuditLogs()
+            }
+        }
+    }
+
+    fun recordAttendance(studentId: String, unitCode: String, date: String, status: String) {
+        viewModelScope.launch {
+            if (repository.recordAttendance(studentId, unitCode, date, status)) {
+                val student = repository.getStudent(studentId)
+                if (student != null) selectStudent(student)
+                loadAuditLogs()
+            }
+        }
+    }
+
+    fun recordFeePayment(
+        studentId: String,
+        amount: Double,
+        receiptNo: String,
+        date: String,
+        description: String,
+        onResult: (Boolean) -> Unit
+    ) {
+        viewModelScope.launch {
+            val success = repository.recordFeePayment(studentId, amount, receiptNo, date, description)
+            if (success) {
+                val student = repository.getStudent(studentId)
+                if (student != null) selectStudent(student)
+                loadAuditLogs()
+            }
+            onResult(success)
+        }
+    }
+
+    fun recordTuitionInvoice(studentId: String, amount: Double, date: String, description: String) {
+        viewModelScope.launch {
+            if (repository.recordTuitionInvoice(studentId, amount, date, description)) {
+                val student = repository.getStudent(studentId)
+                if (student != null) selectStudent(student)
+                loadAuditLogs()
+            }
+        }
+    }
+
     fun loadAllStudents() {
         viewModelScope.launch {
             _uiState.update { AdminUiState.Loading }
