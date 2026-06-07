@@ -126,28 +126,32 @@ fun AdminDashboardScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .background(LightDoveGray)
+                .background(MaterialTheme.colorScheme.background)
         ) {
             // Top Tab Row
             TabRow(
                 selectedTabIndex = activeTab,
-                containerColor = DarkMaroon,
-                contentColor = ShinyGold,
+                containerColor = MaterialTheme.colorScheme.surface,
+                contentColor = MaterialTheme.colorScheme.primary,
                 indicator = { tabPositions ->
                     TabRowDefaults.SecondaryIndicator(
                         modifier = Modifier.tabIndicatorOffset(tabPositions[activeTab]),
-                        color = ShinyGold
+                        color = MaterialTheme.colorScheme.primary
                     )
-                }
+                },
+                modifier = Modifier.clip(RoundedCornerShape(8.dp)).padding(bottom = 8.dp)
             ) {
                 mainTabs.forEachIndexed { index, title ->
+                    val selected = activeTab == index
                     Tab(
-                        selected = activeTab == index,
+                        selected = selected,
                         onClick = { activeTab = index },
+                        selectedContentColor = MaterialTheme.colorScheme.primary,
+                        unselectedContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
                         text = {
                             Text(
                                 text = title,
-                                color = if (activeTab == index) ShinyGold else Color.White,
+                                color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 12.sp
                             )
@@ -188,7 +192,7 @@ fun AdminDashboardScreen(
                                 ) {
                                     // Quick Welcome & Tools header
                                     Card(
-                                        colors = CardDefaults.cardColors(containerColor = Color.White),
+                                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                                         shape = RoundedCornerShape(12.dp),
                                         modifier = Modifier
                                             .fillMaxWidth()
@@ -264,7 +268,7 @@ fun AdminDashboardScreen(
                                         ) {
                                             items(filteredStudents) { student ->
                                                 Card(
-                                                    colors = CardDefaults.cardColors(containerColor = Color.White),
+                                                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                                                     shape = RoundedCornerShape(10.dp),
                                                     modifier = Modifier
                                                         .fillMaxWidth()
@@ -361,7 +365,7 @@ fun AdminDashboardScreen(
                         ) {
                             // Header Actions Card
                             Card(
-                                colors = CardDefaults.cardColors(containerColor = Color.White),
+                                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                                 shape = RoundedCornerShape(12.dp),
                                 modifier = Modifier.fillMaxWidth()
                             ) {
@@ -402,7 +406,7 @@ fun AdminDashboardScreen(
 
                             // Departments List
                             Card(
-                                colors = CardDefaults.cardColors(containerColor = Color.White),
+                                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                                 shape = RoundedCornerShape(12.dp),
                                 modifier = Modifier.fillMaxWidth()
                             ) {
@@ -427,7 +431,7 @@ fun AdminDashboardScreen(
 
                             // Courses List
                             Card(
-                                colors = CardDefaults.cardColors(containerColor = Color.White),
+                                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                                 shape = RoundedCornerShape(12.dp),
                                 modifier = Modifier.fillMaxWidth()
                             ) {
@@ -453,7 +457,7 @@ fun AdminDashboardScreen(
 
                             // Units List
                             Card(
-                                colors = CardDefaults.cardColors(containerColor = Color.White),
+                                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                                 shape = RoundedCornerShape(12.dp),
                                 modifier = Modifier.fillMaxWidth()
                             ) {
@@ -486,7 +490,7 @@ fun AdminDashboardScreen(
                                 .padding(16.dp)
                         ) {
                             Card(
-                                colors = CardDefaults.cardColors(containerColor = Color.White),
+                                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                                 shape = RoundedCornerShape(12.dp),
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -511,7 +515,7 @@ fun AdminDashboardScreen(
                             }
 
                             Card(
-                                colors = CardDefaults.cardColors(containerColor = Color.White),
+                                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                                 shape = RoundedCornerShape(12.dp),
                                 modifier = Modifier.fillMaxWidth().weight(1f)
                             ) {
@@ -586,7 +590,7 @@ fun AdminDashboardScreen(
                                 .padding(16.dp)
                         ) {
                             Card(
-                                colors = CardDefaults.cardColors(containerColor = Color.White),
+                                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                                 shape = RoundedCornerShape(12.dp),
                                 modifier = Modifier.fillMaxWidth().weight(1f)
                             ) {
@@ -942,7 +946,7 @@ private fun StudentDetailDialog(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(padding)
-                        .background(LightDoveGray)
+                        .background(MaterialTheme.colorScheme.background)
                         .padding(16.dp)
                 ) {
                     // Quick Stats strip
@@ -950,19 +954,19 @@ private fun StudentDetailDialog(
                         modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp),
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        Card(modifier = Modifier.weight(1f), colors = CardDefaults.cardColors(containerColor = Color.White)) {
+                        Card(modifier = Modifier.weight(1f), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
                             Column(modifier = Modifier.padding(10.dp), horizontalAlignment = Alignment.CenterHorizontally) {
                                 Text("Status", fontSize = 10.sp, color = DoveGray)
                                 Text(student.enrollmentStatus, fontSize = 12.sp, fontWeight = FontWeight.Bold, color = DarkMaroon)
                             }
                         }
-                        Card(modifier = Modifier.weight(1f), colors = CardDefaults.cardColors(containerColor = Color.White)) {
+                        Card(modifier = Modifier.weight(1f), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
                             Column(modifier = Modifier.padding(10.dp), horizontalAlignment = Alignment.CenterHorizontally) {
                                 Text("Grad Cleared", fontSize = 10.sp, color = DoveGray)
                                 Text(if (student.graduationCleared) "Yes" else "No", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = ShinyGold)
                             }
                         }
-                        Card(modifier = Modifier.weight(1f), colors = CardDefaults.cardColors(containerColor = Color.White)) {
+                        Card(modifier = Modifier.weight(1f), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
                             Column(modifier = Modifier.padding(10.dp), horizontalAlignment = Alignment.CenterHorizontally) {
                                 Text("Balance Due", fontSize = 10.sp, color = DoveGray)
                                 Text("KES ${String.format("%.0f", student.feeBalance)}", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = if (student.feeBalance > 0.0) Color(0xFFC62828) else Color(0xFF2E7D32))
@@ -972,7 +976,7 @@ private fun StudentDetailDialog(
 
                     TabRow(
                         selectedTabIndex = selectedTab,
-                        containerColor = Color.White,
+                        containerColor = MaterialTheme.colorScheme.surface,
                         contentColor = DarkMaroon,
                         modifier = Modifier.clip(RoundedCornerShape(8.dp)).padding(bottom = 12.dp)
                     ) {
@@ -981,9 +985,9 @@ private fun StudentDetailDialog(
                             Tab(
                                 selected = selected,
                                 onClick = { selectedTab = index; showActionForm = null },
-                                selectedContentColor = DarkMaroon,
-                                unselectedContentColor = DoveGray,
-                                text = { Text(title, fontSize = 11.sp, fontWeight = FontWeight.Bold, color = if (selected) DarkMaroon else DoveGray) }
+                                selectedContentColor = MaterialTheme.colorScheme.primary,
+                                unselectedContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                text = { Text(title, fontSize = 11.sp, fontWeight = FontWeight.Bold, color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant) }
                             )
                         }
                     }
@@ -1028,7 +1032,7 @@ private fun StudentDetailDialog(
 
                                     // Registrar Direct Actions Area
                                     Card(
-                                        colors = CardDefaults.cardColors(containerColor = Color.White),
+                                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                                         shape = RoundedCornerShape(12.dp),
                                         modifier = Modifier.fillMaxWidth()
                                     ) {
@@ -1114,7 +1118,7 @@ private fun StudentDetailDialog(
                                 Column(modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(6.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                                     // Registrar Direct Invoicing/Payment Controls
                                     Card(
-                                        colors = CardDefaults.cardColors(containerColor = Color.White),
+                                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                                         shape = RoundedCornerShape(12.dp),
                                         modifier = Modifier.fillMaxWidth()
                                     ) {
@@ -1635,7 +1639,7 @@ private fun FolderSection(
     content: @Composable ColumnScope.() -> Unit
 ) {
     Card(
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         shape = RoundedCornerShape(12.dp),
         modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
     ) {
