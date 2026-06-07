@@ -169,7 +169,7 @@ fun AdminDashboardScreen(
                     0 -> { // Students Tab
                         when (val uiState = state) {
                             is AdminUiState.Loading -> {
-                                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center), color = DarkMaroon)
+                                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center), color = MaterialTheme.colorScheme.primary)
                             }
                             is AdminUiState.Error -> {
                                 Column(
@@ -206,19 +206,19 @@ fun AdminDashboardScreen(
                                             verticalAlignment = Alignment.CenterVertically
                                         ) {
                                             Column {
-                                                Text("Logged In: Registrar", fontSize = 11.sp, color = DoveGray)
-                                                Text("ID: $adminId", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = DarkMaroon)
+                                                Text("Logged In: Registrar", fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                                Text("ID: $adminId", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
                                             }
                                             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                                                 Button(
                                                     onClick = { showAddStudentDialog = true },
-                                                    colors = ButtonDefaults.buttonColors(containerColor = DarkMaroon),
+                                                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
                                                     shape = RoundedCornerShape(8.dp),
                                                     contentPadding = PaddingValues(horizontal = 10.dp, vertical = 6.dp)
                                                 ) {
-                                                    Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(16.dp))
+                                                    Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(16.dp), tint = MaterialTheme.colorScheme.onPrimary)
                                                     Spacer(modifier = Modifier.width(4.dp))
-                                                    Text("Register", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                                                    Text("Register", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onPrimary)
                                                 }
                                                 Button(
                                                     onClick = { csvPickerLauncher.launch("text/*") },
@@ -243,8 +243,8 @@ fun AdminDashboardScreen(
                                         shape = RoundedCornerShape(12.dp),
                                         singleLine = true,
                                         colors = OutlinedTextFieldDefaults.colors(
-                                            focusedBorderColor = DarkMaroon,
-                                            focusedLabelColor = DarkMaroon
+                                            focusedBorderColor = MaterialTheme.colorScheme.primary,
+                                            focusedLabelColor = MaterialTheme.colorScheme.primary
                                         ),
                                         modifier = Modifier
                                             .fillMaxWidth()
@@ -259,7 +259,7 @@ fun AdminDashboardScreen(
 
                                     if (filteredStudents.isEmpty()) {
                                         Box(modifier = Modifier.fillMaxWidth().weight(1f), contentAlignment = Alignment.Center) {
-                                            Text("No students found matching query.", color = DoveGray)
+                                            Text("No students found matching query.", color = MaterialTheme.colorScheme.onSurfaceVariant)
                                         }
                                     } else {
                                         LazyColumn(
@@ -287,14 +287,14 @@ fun AdminDashboardScreen(
                                                             Text(
                                                                 text = student.firstName.take(1) + student.lastName.take(1),
                                                                 fontWeight = FontWeight.Bold,
-                                                                color = DarkMaroon
+                                                                color = MaterialTheme.colorScheme.primary
                                                             )
                                                         }
                                                         Spacer(modifier = Modifier.width(14.dp))
                                                         Column(modifier = Modifier.weight(1f)) {
-                                                            Text(student.fullName.uppercase(), fontWeight = FontWeight.Bold, fontSize = 14.sp, color = DarkMaroon)
-                                                            Text("ADM: ${student.admissionNo}", fontSize = 12.sp, color = Color.Black)
-                                                            Text("Course: ${student.courseCode} | Year: ${student.currentYear}", fontSize = 11.sp, color = DoveGray, fontWeight = FontWeight.SemiBold)
+                                                            Text(student.fullName.uppercase(), fontWeight = FontWeight.Bold, fontSize = 14.sp, color = MaterialTheme.colorScheme.primary)
+                                                            Text("ADM: ${student.admissionNo}", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurface)
+                                                            Text("Course: ${student.courseCode} | Year: ${student.currentYear}", fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant, fontWeight = FontWeight.SemiBold)
                                                         }
                                                         Icon(Icons.Default.ChevronRight, contentDescription = null, tint = DoveGray)
                                                     }
@@ -370,7 +370,7 @@ fun AdminDashboardScreen(
                                 modifier = Modifier.fillMaxWidth()
                             ) {
                                 Column(modifier = Modifier.padding(14.dp)) {
-                                    Text("Curriculum Setup Modules", fontWeight = FontWeight.Bold, fontSize = 16.sp, color = DarkMaroon)
+                                    Text("Curriculum Setup Modules", fontWeight = FontWeight.Bold, fontSize = 16.sp, color = MaterialTheme.colorScheme.primary)
                                     Spacer(modifier = Modifier.height(10.dp))
                                     Row(
                                         modifier = Modifier.fillMaxWidth(),
@@ -378,11 +378,11 @@ fun AdminDashboardScreen(
                                     ) {
                                         Button(
                                             onClick = { showAddDeptDialog = true },
-                                            colors = ButtonDefaults.buttonColors(containerColor = DarkMaroon),
+                                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
                                             shape = RoundedCornerShape(8.dp),
                                             modifier = Modifier.weight(1f)
                                         ) {
-                                            Text("+ Dept", fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                                            Text("+ Dept", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onPrimary)
                                         }
                                         Button(
                                             onClick = { showAddCourseDialog = true },
@@ -411,15 +411,15 @@ fun AdminDashboardScreen(
                                 modifier = Modifier.fillMaxWidth()
                             ) {
                                 Column(modifier = Modifier.padding(14.dp)) {
-                                    Text("Academic Departments", fontWeight = FontWeight.Bold, fontSize = 14.sp, color = DarkMaroon)
+                                    Text("Academic Departments", fontWeight = FontWeight.Bold, fontSize = 14.sp, color = MaterialTheme.colorScheme.primary)
                                     Spacer(modifier = Modifier.height(8.dp))
                                     if (departments.isEmpty()) {
-                                        Text("No departments configured.", fontSize = 12.sp, color = DoveGray)
+                                        Text("No departments configured.", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                     } else {
                                         departments.forEach { dept ->
                                             Column(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
                                                 Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
-                                                    Text(dept.code, fontWeight = FontWeight.Bold, fontSize = 12.sp, color = DarkMaroon)
+                                                    Text(dept.code, fontWeight = FontWeight.Bold, fontSize = 12.sp, color = MaterialTheme.colorScheme.primary)
                                                     Text(dept.name, fontSize = 12.sp)
                                                 }
                                                 HorizontalDivider(color = LightDoveGray.copy(alpha = 0.5f), modifier = Modifier.padding(top = 4.dp))
@@ -436,17 +436,17 @@ fun AdminDashboardScreen(
                                 modifier = Modifier.fillMaxWidth()
                             ) {
                                 Column(modifier = Modifier.padding(14.dp)) {
-                                    Text("Configured Courses", fontWeight = FontWeight.Bold, fontSize = 14.sp, color = DarkMaroon)
+                                    Text("Configured Courses", fontWeight = FontWeight.Bold, fontSize = 14.sp, color = MaterialTheme.colorScheme.primary)
                                     Spacer(modifier = Modifier.height(8.dp))
                                     if (courses.isEmpty()) {
-                                        Text("No courses configured.", fontSize = 12.sp, color = DoveGray)
+                                        Text("No courses configured.", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                     } else {
                                         courses.forEach { course ->
                                             Column(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
                                                 Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
-                                                    Text(course.code, fontWeight = FontWeight.Bold, fontSize = 12.sp, color = DarkMaroon)
+                                                    Text(course.code, fontWeight = FontWeight.Bold, fontSize = 12.sp, color = MaterialTheme.colorScheme.primary)
                                                     Text(course.name, fontSize = 12.sp, modifier = Modifier.weight(1f).padding(horizontal = 8.dp), textAlign = TextAlign.End)
-                                                    Text(course.departmentCode, fontSize = 11.sp, color = DoveGray, fontWeight = FontWeight.SemiBold)
+                                                    Text(course.departmentCode, fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant, fontWeight = FontWeight.SemiBold)
                                                 }
                                                 HorizontalDivider(color = LightDoveGray.copy(alpha = 0.5f), modifier = Modifier.padding(top = 4.dp))
                                             }
@@ -462,17 +462,17 @@ fun AdminDashboardScreen(
                                 modifier = Modifier.fillMaxWidth()
                             ) {
                                 Column(modifier = Modifier.padding(14.dp)) {
-                                    Text("Competency Units Setup", fontWeight = FontWeight.Bold, fontSize = 14.sp, color = DarkMaroon)
+                                    Text("Competency Units Setup", fontWeight = FontWeight.Bold, fontSize = 14.sp, color = MaterialTheme.colorScheme.primary)
                                     Spacer(modifier = Modifier.height(8.dp))
                                     if (units.isEmpty()) {
-                                        Text("No units configured.", fontSize = 12.sp, color = DoveGray)
+                                        Text("No units configured.", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                     } else {
                                         units.forEach { unit ->
                                             Column(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
                                                 Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
-                                                    Text(unit.code, fontWeight = FontWeight.Bold, fontSize = 12.sp, color = DarkMaroon)
+                                                    Text(unit.code, fontWeight = FontWeight.Bold, fontSize = 12.sp, color = MaterialTheme.colorScheme.primary)
                                                     Text(unit.name, fontSize = 12.sp, modifier = Modifier.weight(1f).padding(horizontal = 8.dp), textAlign = TextAlign.End)
-                                                    Text("Course: ${unit.courseCode}", fontSize = 11.sp, color = DoveGray, fontWeight = FontWeight.SemiBold)
+                                                    Text("Course: ${unit.courseCode}", fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant, fontWeight = FontWeight.SemiBold)
                                                 }
                                                 HorizontalDivider(color = LightDoveGray.copy(alpha = 0.5f), modifier = Modifier.padding(top = 4.dp))
                                             }
@@ -501,15 +501,15 @@ fun AdminDashboardScreen(
                                     horizontalArrangement = Arrangement.SpaceBetween,
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    Text("Credentials Profiles", fontWeight = FontWeight.Bold, fontSize = 14.sp, color = DarkMaroon)
+                                    Text("Credentials Profiles", fontWeight = FontWeight.Bold, fontSize = 14.sp, color = MaterialTheme.colorScheme.primary)
                                     Button(
                                         onClick = { showAddUserDialog = true },
-                                        colors = ButtonDefaults.buttonColors(containerColor = DarkMaroon),
+                                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
                                         shape = RoundedCornerShape(8.dp)
                                     ) {
-                                        Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(16.dp))
+                                        Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(16.dp), tint = MaterialTheme.colorScheme.onPrimary)
                                         Spacer(modifier = Modifier.width(4.dp))
-                                        Text("Provision User", fontSize = 11.sp)
+                                        Text("Provision User", fontSize = 11.sp, color = MaterialTheme.colorScheme.onPrimary)
                                     }
                                 }
                             }
@@ -540,13 +540,13 @@ fun AdminDashboardScreen(
                                                 Icon(
                                                     imageVector = if (user.role == "ADMIN") Icons.Default.AdminPanelSettings else Icons.Default.Person,
                                                     contentDescription = null,
-                                                    tint = if (user.role == "ADMIN") DarkMaroon else Color(0xFF2E7D32)
+                                                    tint = if (user.role == "ADMIN") Color(0xFFC62828) else Color(0xFF2E7D32)
                                                 )
                                             }
                                             Spacer(modifier = Modifier.width(12.dp))
                                             Column(modifier = Modifier.weight(1f)) {
                                                 Text(user.username, fontWeight = FontWeight.Bold, fontSize = 13.sp)
-                                                Text(user.email, fontSize = 11.sp, color = DoveGray)
+                                                Text(user.email, fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                             }
                                             Card(
                                                 colors = CardDefaults.cardColors(
@@ -558,7 +558,7 @@ fun AdminDashboardScreen(
                                                     text = user.role,
                                                     fontSize = 10.sp,
                                                     fontWeight = FontWeight.Bold,
-                                                    color = if (user.role == "ADMIN") DarkMaroon else Color(0xFF2E7D32),
+                                                    color = if (user.role == "ADMIN") Color(0xFFC62828) else Color(0xFF2E7D32),
                                                     modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
                                                 )
                                             }
@@ -600,15 +600,15 @@ fun AdminDashboardScreen(
                                         horizontalArrangement = Arrangement.SpaceBetween,
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
-                                        Text("System Audit Trail Logs", fontWeight = FontWeight.Bold, fontSize = 14.sp, color = DarkMaroon)
+                                        Text("System Audit Trail Logs", fontWeight = FontWeight.Bold, fontSize = 14.sp, color = MaterialTheme.colorScheme.primary)
                                         IconButton(onClick = { viewModel.loadAuditLogs() }) {
-                                            Icon(Icons.Default.Refresh, contentDescription = "Refresh logs", tint = DarkMaroon)
+                                            Icon(Icons.Default.Refresh, contentDescription = "Refresh logs", tint = MaterialTheme.colorScheme.primary)
                                         }
                                     }
                                     Spacer(modifier = Modifier.height(10.dp))
                                     if (auditLogs.isEmpty()) {
                                         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                                            Text("No audit logs available.", color = DoveGray)
+                                            Text("No audit logs available.", color = MaterialTheme.colorScheme.onSurfaceVariant)
                                         }
                                     } else {
                                         LazyColumn(
@@ -645,10 +645,10 @@ fun AdminDashboardScreen(
                                                                 modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
                                                             )
                                                         }
-                                                        Text(log.timestamp, fontSize = 10.sp, color = DoveGray)
+                                                        Text(log.timestamp, fontSize = 10.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                                     }
                                                     Spacer(modifier = Modifier.height(4.dp))
-                                                    Text(log.description, fontSize = 12.sp, color = Color.Black)
+                                                    Text(log.description, fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurface)
                                                     HorizontalDivider(color = LightDoveGray, modifier = Modifier.padding(top = 8.dp))
                                                 }
                                             }
@@ -696,9 +696,9 @@ fun AdminDashboardScreen(
                                 showAddDeptDialog = false
                             }
                         },
-                        colors = ButtonDefaults.buttonColors(containerColor = DarkMaroon)
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                     ) {
-                        Text("Add")
+                        Text("Add", color = MaterialTheme.colorScheme.onPrimary)
                     }
                 },
                 dismissButton = {
@@ -729,7 +729,7 @@ fun AdminDashboardScreen(
                                 modifier = Modifier.fillMaxWidth(),
                                 shape = RoundedCornerShape(8.dp)
                             ) {
-                                Text(selectedDept, color = DarkMaroon)
+                                Text(selectedDept, color = MaterialTheme.colorScheme.primary)
                             }
                             DropdownMenu(expanded = deptExpanded, onDismissRequest = { deptExpanded = false }) {
                                 departments.forEach { dept ->
@@ -753,9 +753,9 @@ fun AdminDashboardScreen(
                                 showAddCourseDialog = false
                             }
                         },
-                        colors = ButtonDefaults.buttonColors(containerColor = DarkMaroon)
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                     ) {
-                        Text("Add")
+                        Text("Add", color = MaterialTheme.colorScheme.onPrimary)
                     }
                 },
                 dismissButton = {
@@ -786,7 +786,7 @@ fun AdminDashboardScreen(
                                 modifier = Modifier.fillMaxWidth(),
                                 shape = RoundedCornerShape(8.dp)
                             ) {
-                                Text(selectedCourse, color = DarkMaroon)
+                                Text(selectedCourse, color = MaterialTheme.colorScheme.primary)
                             }
                             DropdownMenu(expanded = courseExpanded, onDismissRequest = { courseExpanded = false }) {
                                 courses.forEach { crs ->
@@ -810,9 +810,9 @@ fun AdminDashboardScreen(
                                 showAddUnitDialog = false
                             }
                         },
-                        colors = ButtonDefaults.buttonColors(containerColor = DarkMaroon)
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                     ) {
-                        Text("Add")
+                        Text("Add", color = MaterialTheme.colorScheme.onPrimary)
                     }
                 },
                 dismissButton = {
@@ -845,7 +845,7 @@ fun AdminDashboardScreen(
                                 modifier = Modifier.fillMaxWidth(),
                                 shape = RoundedCornerShape(8.dp)
                             ) {
-                                Text(role, color = DarkMaroon)
+                                Text(role, color = MaterialTheme.colorScheme.primary)
                             }
                             DropdownMenu(expanded = roleExpanded, onDismissRequest = { roleExpanded = false }) {
                                 listOf("STUDENT", "ADMIN").forEach { r ->
@@ -869,9 +869,9 @@ fun AdminDashboardScreen(
                                 showAddUserDialog = false
                             }
                         },
-                        colors = ButtonDefaults.buttonColors(containerColor = DarkMaroon)
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                     ) {
-                        Text("Provision")
+                        Text("Provision", color = MaterialTheme.colorScheme.onPrimary)
                     }
                 },
                 dismissButton = {
@@ -932,11 +932,11 @@ private fun StudentDetailDialog(
             Scaffold(
                 topBar = {
                     TopAppBar(
-                        title = { Text(student.fullName.uppercase(), fontWeight = FontWeight.Bold, color = Color.White, fontSize = 16.sp) },
-                        colors = TopAppBarDefaults.topAppBarColors(containerColor = DarkMaroon),
+                        title = { Text(student.fullName.uppercase(), fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onPrimary, fontSize = 16.sp) },
+                        colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.primary),
                         navigationIcon = {
                             IconButton(onClick = onDismiss) {
-                                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = Color.White)
+                                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = MaterialTheme.colorScheme.onPrimary)
                             }
                         }
                     )
@@ -956,19 +956,19 @@ private fun StudentDetailDialog(
                     ) {
                         Card(modifier = Modifier.weight(1f), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
                             Column(modifier = Modifier.padding(10.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                                Text("Status", fontSize = 10.sp, color = DoveGray)
-                                Text(student.enrollmentStatus, fontSize = 12.sp, fontWeight = FontWeight.Bold, color = DarkMaroon)
+                                Text("Status", fontSize = 10.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                Text(student.enrollmentStatus, fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
                             }
                         }
                         Card(modifier = Modifier.weight(1f), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
                             Column(modifier = Modifier.padding(10.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                                Text("Grad Cleared", fontSize = 10.sp, color = DoveGray)
+                                Text("Grad Cleared", fontSize = 10.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                 Text(if (student.graduationCleared) "Yes" else "No", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = ShinyGold)
                             }
                         }
                         Card(modifier = Modifier.weight(1f), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
                             Column(modifier = Modifier.padding(10.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                                Text("Balance Due", fontSize = 10.sp, color = DoveGray)
+                                Text("Balance Due", fontSize = 10.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                 Text("KES ${String.format("%.0f", student.feeBalance)}", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = if (student.feeBalance > 0.0) Color(0xFFC62828) else Color(0xFF2E7D32))
                             }
                         }
@@ -977,7 +977,7 @@ private fun StudentDetailDialog(
                     TabRow(
                         selectedTabIndex = selectedTab,
                         containerColor = MaterialTheme.colorScheme.surface,
-                        contentColor = DarkMaroon,
+                        contentColor = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.clip(RoundedCornerShape(8.dp)).padding(bottom = 12.dp)
                     ) {
                         tabs.forEachIndexed { index, title ->
@@ -1021,11 +1021,11 @@ private fun StudentDetailDialog(
                                         FolderItem("Current Year", "Year ${student.currentYear}")
                                         FolderItem("Enrollment Status", student.enrollmentStatus)
                                         Row(modifier = Modifier.fillMaxWidth().padding(top = 8.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
-                                            Text("Graduation Clearance Status:", fontSize = 12.sp, color = Color.Gray)
+                                            Text("Graduation Clearance Status:", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                             Switch(
                                                 checked = student.graduationCleared,
                                                 onCheckedChange = { onUpdateGraduation(it) },
-                                                colors = SwitchDefaults.colors(checkedThumbColor = DarkMaroon, checkedTrackColor = ShinyGold)
+                                                colors = SwitchDefaults.colors(checkedThumbColor = MaterialTheme.colorScheme.primary, checkedTrackColor = ShinyGold)
                                             )
                                         }
                                     }
@@ -1037,7 +1037,7 @@ private fun StudentDetailDialog(
                                         modifier = Modifier.fillMaxWidth()
                                     ) {
                                         Column(modifier = Modifier.padding(14.dp)) {
-                                            Text("Registrar Academic Actions", fontWeight = FontWeight.Bold, fontSize = 13.sp, color = DarkMaroon)
+                                            Text("Registrar Academic Actions", fontWeight = FontWeight.Bold, fontSize = 13.sp, color = MaterialTheme.colorScheme.primary)
                                             Spacer(modifier = Modifier.height(8.dp))
                                             Row(
                                                 modifier = Modifier.fillMaxWidth(),
@@ -1045,11 +1045,11 @@ private fun StudentDetailDialog(
                                             ) {
                                                 Button(
                                                     onClick = { showEnrollDialog = true },
-                                                    colors = ButtonDefaults.buttonColors(containerColor = DarkMaroon),
+                                                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
                                                     shape = RoundedCornerShape(8.dp),
                                                     modifier = Modifier.weight(1f)
                                                 ) {
-                                                    Text("Enroll Unit", fontSize = 11.sp)
+                                                    Text("Enroll Unit", fontSize = 11.sp, color = MaterialTheme.colorScheme.onPrimary)
                                                 }
                                                 Button(
                                                     onClick = { showAttendanceDialog = true },
@@ -1065,7 +1065,7 @@ private fun StudentDetailDialog(
 
                                     FolderSection("Registered Competencies & Grades") {
                                         if (grades.isEmpty()) {
-                                            Text("No academic grades logged. Please enroll student in units.", fontSize = 12.sp, color = Color.Gray, modifier = Modifier.padding(vertical = 4.dp))
+                                            Text("No academic grades logged. Please enroll student in units.", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(vertical = 4.dp))
                                         } else {
                                             grades.forEach { grade ->
                                                 Column(modifier = Modifier.fillMaxWidth()) {
@@ -1080,7 +1080,7 @@ private fun StudentDetailDialog(
                                                                 text = "CAT: ${grade.catMark ?: "-"} | Exam: ${grade.examMark ?: "-"} | Grade: ${grade.gradeLetter}",
                                                                 fontSize = 11.sp,
                                                                 fontWeight = FontWeight.Bold,
-                                                                color = DarkMaroon
+                                                                color = MaterialTheme.colorScheme.primary
                                                             )
                                                         }
                                                         IconButton(onClick = { showEditMarksUnitCode = grade.unitCode }) {
@@ -1095,7 +1095,7 @@ private fun StudentDetailDialog(
 
                                     FolderSection("Attendance Summaries") {
                                         if (attendance.isEmpty()) {
-                                            Text("No attendance summaries recorded.", fontSize = 12.sp, color = Color.Gray)
+                                            Text("No attendance summaries recorded.", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                         } else {
                                             attendance.forEach { summary ->
                                                 Column(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
@@ -1123,7 +1123,7 @@ private fun StudentDetailDialog(
                                         modifier = Modifier.fillMaxWidth()
                                     ) {
                                         Column(modifier = Modifier.padding(14.dp)) {
-                                            Text("Ledger Actions & Updates", fontWeight = FontWeight.Bold, fontSize = 13.sp, color = DarkMaroon)
+                                            Text("Ledger Actions & Updates", fontWeight = FontWeight.Bold, fontSize = 13.sp, color = MaterialTheme.colorScheme.primary)
                                             Spacer(modifier = Modifier.height(8.dp))
                                             Row(
                                                 modifier = Modifier.fillMaxWidth(),
@@ -1139,11 +1139,11 @@ private fun StudentDetailDialog(
                                                 }
                                                 Button(
                                                     onClick = { showInvoiceDialog = true },
-                                                    colors = ButtonDefaults.buttonColors(containerColor = DarkMaroon),
+                                                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
                                                     shape = RoundedCornerShape(8.dp),
                                                     modifier = Modifier.weight(1f)
                                                 ) {
-                                                    Text("Log Invoice", fontSize = 11.sp)
+                                                    Text("Log Invoice", fontSize = 11.sp, color = MaterialTheme.colorScheme.onPrimary)
                                                 }
                                             }
                                         }
@@ -1151,13 +1151,13 @@ private fun StudentDetailDialog(
 
                                     FolderSection("Financial Aid Allocations") {
                                         if (financialAid.isEmpty()) {
-                                            Text("No CDF/Government bursary aid recorded.", fontSize = 12.sp, color = Color.Gray)
+                                            Text("No CDF/Government bursary aid recorded.", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                         } else {
                                             financialAid.forEach { aid ->
                                                 Row(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp), horizontalArrangement = Arrangement.SpaceBetween) {
                                                     Column {
                                                         Text(aid.source, fontSize = 12.sp, fontWeight = FontWeight.Bold)
-                                                        Text("Date: ${aid.allocationDate}", fontSize = 10.sp, color = Color.Gray)
+                                                        Text("Date: ${aid.allocationDate}", fontSize = 10.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                                     }
                                                     Text("KES ${String.format("%,.0f", aid.amount)}", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = Color(0xFF2E7D32))
                                                 }
@@ -1167,19 +1167,19 @@ private fun StudentDetailDialog(
                                     
                                     FolderSection("Transaction & Tuition ledger") {
                                         if (feeStatement == null || feeStatement.items.isEmpty()) {
-                                            Text("No transactions logged in ledger.", fontSize = 12.sp, color = Color.Gray)
+                                            Text("No transactions logged in ledger.", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                         } else {
                                             feeStatement.items.forEach { item ->
                                                 Row(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp), horizontalArrangement = Arrangement.SpaceBetween) {
                                                     Column(modifier = Modifier.weight(1f)) {
                                                         Text(item.description, fontSize = 12.sp, fontWeight = FontWeight.Bold)
-                                                        Text(if (item.type == "PAYMENT") "Receipt: ${item.receiptNo} | ${item.date}" else item.date, fontSize = 10.sp, color = Color.Gray)
+                                                        Text(if (item.type == "PAYMENT") "Receipt: ${item.receiptNo} | ${item.date}" else item.date, fontSize = 10.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                                     }
                                                     Text(
                                                         text = if (item.type == "PAYMENT") "- KES ${String.format("%,.0f", item.amount)}" else "+ KES ${String.format("%,.0f", item.amount)}",
                                                         fontSize = 12.sp,
                                                         fontWeight = FontWeight.Bold,
-                                                        color = if (item.type == "PAYMENT") Color(0xFF2E7D32) else DarkMaroon
+                                                        color = if (item.type == "PAYMENT") Color(0xFF2E7D32) else MaterialTheme.colorScheme.primary
                                                     )
                                                 }
                                             }
@@ -1190,13 +1190,13 @@ private fun StudentDetailDialog(
                                 Column(modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(6.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                                     FolderSection("Competency Portfolios (PoE)") {
                                         if (portfolios.isEmpty()) {
-                                            Text("No evidence portfolios uploaded.", fontSize = 12.sp, color = Color.Gray)
+                                            Text("No evidence portfolios uploaded.", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                         } else {
                                             portfolios.forEach { poe ->
                                                 Row(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp), horizontalArrangement = Arrangement.SpaceBetween) {
                                                     Column {
                                                         Text("Competency Unit: ${poe.unitCode}", fontSize = 12.sp, fontWeight = FontWeight.Bold)
-                                                        Text("Assessor: ${poe.assessorName} | Score: ${poe.score}%", fontSize = 10.sp, color = Color.Gray)
+                                                        Text("Assessor: ${poe.assessorName} | Score: ${poe.score}%", fontSize = 10.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                                     }
                                                     Text(poe.status, fontSize = 12.sp, fontWeight = FontWeight.Bold, color = if (poe.status == "Competent") Color(0xFF2E7D32) else Color(0xFFFFA000))
                                                 }
@@ -1205,29 +1205,29 @@ private fun StudentDetailDialog(
                                     }
                                     FolderSection("Disciplinary Records") {
                                         if (disciplinary.isEmpty()) {
-                                            Text("No disciplinary records found.", fontSize = 12.sp, color = Color.Gray)
+                                            Text("No disciplinary records found.", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                         } else {
                                             disciplinary.forEach { disc ->
                                                 Column(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
                                                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                                                         Text(disc.warningLevel, fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color.Red)
-                                                        Text(disc.status, fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color.Gray)
+                                                        Text(disc.status, fontSize = 11.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                                     }
                                                     Text(disc.description, fontSize = 11.sp)
-                                                    Text("Date Logged: ${disc.date}", fontSize = 9.sp, color = Color.Gray)
+                                                    Text("Date Logged: ${disc.date}", fontSize = 9.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                                 }
                                             }
                                         }
                                     }
                                     FolderSection("Official Institutional Communications") {
                                         if (communications.isEmpty()) {
-                                            Text("No memos or official clearances logged.", fontSize = 12.sp, color = Color.Gray)
+                                            Text("No memos or official clearances logged.", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                         } else {
                                             communications.forEach { comm ->
                                                 Column(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
-                                                    Text("[${comm.documentType}] ${comm.title}", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = DarkMaroon)
+                                                    Text("[${comm.documentType}] ${comm.title}", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
                                                     Text(comm.content, fontSize = 11.sp)
-                                                    Text("Date: ${comm.date}", fontSize = 9.sp, color = Color.Gray)
+                                                    Text("Date: ${comm.date}", fontSize = 9.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                                 }
                                             }
                                         }
@@ -1248,8 +1248,8 @@ private fun StudentDetailDialog(
                                         Button(onClick = { showActionForm = "POE" }, colors = ButtonDefaults.buttonColors(containerColor = ShinyGold, contentColor = Color.Black), modifier = Modifier.weight(1f), shape = RoundedCornerShape(8.dp)) {
                                             Text("Log Portfolio score", fontSize = 11.sp, fontWeight = FontWeight.Bold)
                                         }
-                                        Button(onClick = { showActionForm = "COMM" }, colors = ButtonDefaults.buttonColors(containerColor = DarkMaroon), modifier = Modifier.weight(1f), shape = RoundedCornerShape(8.dp)) {
-                                            Text("Send Clearance Memo", fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                                        Button(onClick = { showActionForm = "COMM" }, colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary), modifier = Modifier.weight(1f), shape = RoundedCornerShape(8.dp)) {
+                                            Text("Send Clearance Memo", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onPrimary)
                                         }
                                     }
 
@@ -1343,10 +1343,10 @@ private fun StudentDetailDialog(
                                                                 showActionForm = null
                                                             }
                                                         },
-                                                        colors = ButtonDefaults.buttonColors(containerColor = DarkMaroon),
+                                                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
                                                         modifier = Modifier.fillMaxWidth()
                                                     ) {
-                                                        Text("Issue Official Letter")
+                                                        Text("Issue Official Letter", color = MaterialTheme.colorScheme.onPrimary)
                                                     }
                                                 }
                                             }
@@ -1381,7 +1381,7 @@ private fun StudentDetailDialog(
                                 shape = RoundedCornerShape(8.dp)
                             ) {
                                 val u = availableUnits.find { it.code == selectedUnitCode }
-                                Text(if (u != null) "${u.code} - ${u.name}" else "Select Unit", color = DarkMaroon)
+                                Text(if (u != null) "${u.code} - ${u.name}" else "Select Unit", color = MaterialTheme.colorScheme.primary)
                             }
                             DropdownMenu(expanded = unitExpanded, onDismissRequest = { unitExpanded = false }) {
                                 availableUnits.forEach { unit ->
@@ -1407,10 +1407,10 @@ private fun StudentDetailDialog(
                             Toast.makeText(context, "Enrolled in unit successfully!", Toast.LENGTH_SHORT).show()
                         }
                     },
-                    colors = ButtonDefaults.buttonColors(containerColor = DarkMaroon),
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
                     enabled = selectedUnitCode.isNotEmpty()
                 ) {
-                    Text("Enroll")
+                    Text("Enroll", color = MaterialTheme.colorScheme.onPrimary)
                 }
             },
             dismissButton = {
@@ -1444,7 +1444,7 @@ private fun StudentDetailDialog(
                                 shape = RoundedCornerShape(8.dp)
                             ) {
                                 val u = grades.find { it.unitCode == selectedUnitCode }
-                                Text(if (u != null) "${u.unitCode} - ${u.unitName}" else "Select Enrolled Unit", color = DarkMaroon)
+                                Text(if (u != null) "${u.unitCode} - ${u.unitName}" else "Select Enrolled Unit", color = MaterialTheme.colorScheme.primary)
                             }
                             DropdownMenu(expanded = unitExpanded, onDismissRequest = { unitExpanded = false }) {
                                 grades.forEach { grade ->
@@ -1485,10 +1485,10 @@ private fun StudentDetailDialog(
                             Toast.makeText(context, "Attendance logged successfully!", Toast.LENGTH_SHORT).show()
                         }
                     },
-                    colors = ButtonDefaults.buttonColors(containerColor = DarkMaroon),
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
                     enabled = selectedUnitCode.isNotEmpty()
                 ) {
-                    Text("Submit")
+                    Text("Submit", color = MaterialTheme.colorScheme.onPrimary)
                 }
             },
             dismissButton = {
@@ -1510,7 +1510,7 @@ private fun StudentDetailDialog(
             title = { Text("Update Marks for $unitCode", fontWeight = FontWeight.Bold) },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                    Text(matchingGrade?.unitName ?: "", fontSize = 12.sp, color = DoveGray)
+                    Text(matchingGrade?.unitName ?: "", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     OutlinedTextField(
                         value = catStr,
                         onValueChange = { catStr = it },
@@ -1536,9 +1536,9 @@ private fun StudentDetailDialog(
                         showEditMarksUnitCode = null
                         Toast.makeText(context, "Academic grades updated!", Toast.LENGTH_SHORT).show()
                     },
-                    colors = ButtonDefaults.buttonColors(containerColor = DarkMaroon)
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                 ) {
-                    Text("Save")
+                    Text("Save", color = MaterialTheme.colorScheme.onPrimary)
                 }
             },
             dismissButton = {
@@ -1620,10 +1620,10 @@ private fun StudentDetailDialog(
                             Toast.makeText(context, "Tuition billed, student balance adjusted!", Toast.LENGTH_LONG).show()
                         }
                     },
-                    colors = ButtonDefaults.buttonColors(containerColor = DarkMaroon),
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
                     enabled = amountStr.isNotEmpty()
                 ) {
-                    Text("Log Invoice")
+                    Text("Log Invoice", color = MaterialTheme.colorScheme.onPrimary)
                 }
             },
             dismissButton = {
@@ -1647,7 +1647,7 @@ private fun FolderSection(
             modifier = Modifier.padding(14.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Text(title, fontSize = 14.sp, fontWeight = FontWeight.Bold, color = DarkMaroon)
+            Text(title, fontSize = 14.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
             HorizontalDivider(color = LightDoveGray)
             content()
         }
@@ -1660,8 +1660,8 @@ private fun FolderItem(label: String, value: String) {
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text(label, fontSize = 12.sp, color = DoveGray, fontWeight = FontWeight.Medium)
-        Text(value, fontSize = 12.sp, color = Color.Black, fontWeight = FontWeight.Bold, textAlign = TextAlign.End)
+        Text(label, fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant, fontWeight = FontWeight.Medium)
+        Text(value, fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold, textAlign = TextAlign.End)
     }
 }
 
@@ -1718,7 +1718,7 @@ private fun AddStudentDialog(
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(8.dp)
                     ) {
-                        Text(courseCode, color = DarkMaroon)
+                        Text(courseCode, color = MaterialTheme.colorScheme.primary)
                     }
                     DropdownMenu(expanded = courseExpanded, onDismissRequest = { courseExpanded = false }) {
                         coursesList.forEach { crs ->
@@ -1768,9 +1768,9 @@ private fun AddStudentDialog(
                         onAddStudent(student)
                     }
                 },
-                colors = ButtonDefaults.buttonColors(containerColor = DarkMaroon)
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
             ) {
-                Text("Enroll Student")
+                Text("Enroll Student", color = MaterialTheme.colorScheme.onPrimary)
             }
         },
         dismissButton = {
